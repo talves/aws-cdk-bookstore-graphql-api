@@ -1,5 +1,5 @@
-import { Duration, Expiration, Stack, StackProps } from 'aws-cdk-lib';
-import {Construct} from "constructs";
+import { Duration, Expiration, Stack, StackProps } from "aws-cdk-lib";
+import { Construct } from "constructs";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as appsync from "@aws-cdk/aws-appsync-alpha";
 import * as lambda from "aws-cdk-lib/aws-lambda";
@@ -18,9 +18,9 @@ export class BookstoreGraphqlApiStack extends Stack {
           apiKeyConfig: {
             name: "My very own API key",
             expires: Expiration.after(Duration.days(365)),
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     const booksTable = new dynamodb.Table(this, "BooksTable", {
@@ -29,15 +29,15 @@ export class BookstoreGraphqlApiStack extends Stack {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-    })
+    });
 
     const listBooksLambda = new lambda.Function(this, "list-books-handler", {
       code: lambda.Code.fromAsset("functions"),
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: "listBooks.handler",
       environment: {
-        BOOKS_TABLE:booksTable.tableName,
-      }
+        BOOKS_TABLE: booksTable.tableName,
+      },
     });
 
     // ensures the lambda can read from the table (minimal security for protection)
@@ -45,12 +45,34 @@ export class BookstoreGraphqlApiStack extends Stack {
 
     const listBooksDataSource = api.addLambdaDataSource(
       "listBooksDataSource",
-      listBooksLambda,
+      listBooksLambda
     );
 
     listBooksDataSource.createResolver({
       typeName: "Query",
       fieldName: "listBooks",
-    })
+    });
+
+    const createBookLambda = new lambda.Function(this, "creatBookHandler", {
+      code: lambda.Code.fromAsset("functions"),
+      runtime: lambda.Runtime.NODEJS_16_X,
+      handler: "createBook.handler",
+      environment: {
+        BOOKS_TABLE: booksTable.tableName,
+      },
+    });
+
+    booksTable.grantReadWriteData(createBookLambda);
+
+    // Lambda datasource for the create Book function
+    const createBookDataSource = api.addLambdaDataSource(
+      "createBookDataSource",
+      createBookLambda
+    );
+
+    createBookDataSource.createResolver({
+      typeName: "Mutation",
+      fieldName: "createBook",
+    });
   }
 }
