@@ -104,14 +104,14 @@ export class BookstoreGraphqlApiStack extends Stack {
 
     const updateBookLambda = new nodeJsLambda.NodejsFunction(
       this,
-      "updateBook",
+      "updateBookHandler",
       {
         ...commonLambdaProps,
         entry: path.join(__dirname, "../functions/updateBook.ts"),
       }
     );
 
-    booksTable.grantReadWriteData(createBookLambda);
+    booksTable.grantReadWriteData(updateBookLambda);
 
     // Lambda datasource for the create Book function
     const updateBookDataSource = api.addLambdaDataSource(
