@@ -3,6 +3,7 @@ import {Construct} from "constructs";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as appsync from "@aws-cdk/aws-appsync-alpha";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 
 export class BookstoreGraphqlApiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -22,11 +23,25 @@ export class BookstoreGraphqlApiStack extends Stack {
       }
     });
 
+    const booksTable = new dynamodb.Table(this, "BooksTable", {
+      partitionKey: {
+        name: "id",
+        type: dynamodb.AttributeType.STRING,
+      },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    })
+
     const listBooksLambda = new lambda.Function(this, "list-books-handler", {
       code: lambda.Code.fromAsset("functions"),
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: "listBooks.handler",
+      environment: {
+        BOOKS_TABLE:booksTable.tableName,
+      }
     });
+
+    // ensures the lambda can read from the table (minimal security for protection)
+    booksTable.grantReadData(listBooksLambda);
 
     const listBooksDataSource = api.addLambdaDataSource(
       "listBooksDataSource",
