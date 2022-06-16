@@ -17,7 +17,7 @@ export const handler: AppSyncResolverHandler<
       return null;
     }
 
-    const data = await documentClient
+    await documentClient
       .put({ TableName: process.env.BOOKS_TABLE, Item: book })
       .promise();
 

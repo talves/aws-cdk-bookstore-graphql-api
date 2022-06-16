@@ -35,6 +35,7 @@ export class BookstoreGraphqlApiStack extends Stack {
       code: lambda.Code.fromAsset("functions"),
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: "listBooks.handler",
+      memorySize: 1024,
       environment: {
         BOOKS_TABLE: booksTable.tableName,
       },
@@ -53,10 +54,11 @@ export class BookstoreGraphqlApiStack extends Stack {
       fieldName: "listBooks",
     });
 
-    const createBookLambda = new lambda.Function(this, "creatBookHandler", {
+    const createBookLambda = new lambda.Function(this, "createBookHandler", {
       code: lambda.Code.fromAsset("functions"),
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: "createBook.handler",
+      memorySize: 1024,
       environment: {
         BOOKS_TABLE: booksTable.tableName,
       },
