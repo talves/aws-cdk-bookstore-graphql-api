@@ -1,9 +1,12 @@
 import { Duration, Expiration, Stack, StackProps } from "aws-cdk-lib";
+// import { aws_lambda_nodejs as nodeJsLambda } from "aws-cdk-lib";
 import { Construct } from "constructs";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as appsync from "@aws-cdk/aws-appsync-alpha";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as nodeJsLambda from "aws-cdk-lib/aws-lambda-nodejs";
+import * as path from "path";
 
 export class BookstoreGraphqlApiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -97,6 +100,28 @@ export class BookstoreGraphqlApiStack extends Stack {
     getBookByIdDataSource.createResolver({
       typeName: "Query",
       fieldName: "getBookById",
+    });
+
+    const updateBookLambda = new nodeJsLambda.NodejsFunction(
+      this,
+      "updateBook",
+      {
+        ...commonLambdaProps,
+        entry: path.join(__dirname, "../functions/updateBook.ts"),
+      }
+    );
+
+    booksTable.grantReadWriteData(createBookLambda);
+
+    // Lambda datasource for the create Book function
+    const updateBookDataSource = api.addLambdaDataSource(
+      "updateBookDataSource",
+      updateBookLambda
+    );
+
+    updateBookDataSource.createResolver({
+      typeName: "Mutation",
+      fieldName: "updateBook",
     });
   }
 }
