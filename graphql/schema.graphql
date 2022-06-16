@@ -23,7 +23,8 @@ input BookInput {
 
 input UpdateBookInput {
   id: ID!
-  title: String!
+  title: String
   completed: Boolean
   rating: Int
+  reviews: [String]
 }
