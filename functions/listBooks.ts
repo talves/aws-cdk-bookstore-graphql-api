@@ -1,13 +1,6 @@
 import { AppSyncResolverHandler } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
-
-type Book = {
-  id: string;
-  title: string;
-  completed?: boolean;
-  rating?: number;
-  reviews?: string;
-};
+import { Book } from "../types/books";
 
 const documentClient = new DynamoDB.DocumentClient();
 
@@ -23,7 +16,7 @@ export const handler: AppSyncResolverHandler<
     }
 
     const data = await documentClient
-      .scan({ TableName: process.env.BOOKS_TABLE })
+      .scan({ TableName: process.env.BOOKS_TABLE }) // expesive pulling in the whole table
       .promise();
 
     return data.Items as Book[];
