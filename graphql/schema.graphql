@@ -32,3 +32,41 @@ input UpdateBookInput {
 type Subscription {
   onUpdateBook: Book @aws_subscribe(mutations: ["updateBook"])
 }
+
+# query ExampleQuery {
+#   listBooks {
+#     id
+#     title
+#     completed
+#     rating
+#     reviews
+#   }
+# }
+
+# query GetBook($bookId: ID!) {
+#   getBookById(bookId: $bookId) {
+#     id
+#     title
+#     rating
+#     completed
+#   }
+# }
+
+# mutation UpdateTheBook {
+#   updateBook(
+#     book: { id: "456", rating: 9, title: "Another mildly Awesome Book" }
+#   ) {
+#     id
+#     title
+#     rating
+#     completed
+#     reviews
+#   }
+# }
+
+# mutation CreateBook {
+#   createBook(book: { id: "999", title: "Test Book" }) {
+#     id
+#     title
+#   }
+# }
