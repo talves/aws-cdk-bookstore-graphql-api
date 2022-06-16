@@ -1,0 +1,20 @@
+[
+  {
+    "id": "456",
+    "completed": true,
+    "rating": 10,
+    "reviews": [
+      "Changed everything about how I live! 🚀"
+    ],
+    "title": "Another Awesome Book"
+  },
+  {
+    "id": "123",
+    "completed": true,
+    "rating": 10,
+    "reviews": [
+      "The best book ever written"
+    ],
+    "title": "My Awesome Book"
+  }
+]

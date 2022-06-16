@@ -76,5 +76,31 @@ export class BookstoreGraphqlApiStack extends Stack {
       typeName: "Mutation",
       fieldName: "createBook",
     });
+
+    // Creates the lambda function
+    const getBookByIdLambda = new lambda.Function(this, "getBookById", {
+      code: lambda.Code.fromAsset("functions"),
+      runtime: lambda.Runtime.NODEJS_16_X,
+      handler: "getBookById.handler",
+      memorySize: 1024,
+      environment: {
+        BOOKS_TABLE: booksTable.tableName,
+      },
+    });
+
+    // Grants the permissions to allow function to read the data from DynamoDB Table
+    booksTable.grantReadData(getBookByIdLambda);
+
+    // Creates the data source for the appsync api
+    const getBookByIdDataSource = api.addLambdaDataSource(
+      "getBookByIdDataSource",
+      getBookByIdLambda
+    );
+
+    // makes sure whenever we use graphql Query for the resolver it executes the lambda function
+    getBookByIdDataSource.createResolver({
+      typeName: "Query",
+      fieldName: "getBookById",
+    });
   }
 }
